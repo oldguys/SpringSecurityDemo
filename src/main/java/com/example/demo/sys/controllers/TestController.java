@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class TestController {
 
+
     @RequestMapping("/")
     public String index(Model model) {
 
@@ -26,9 +27,12 @@ public class TestController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         System.out.println(userDetails);
+        StringBuilder builder = new StringBuilder();
         for (GrantedAuthority authority: userDetails.getAuthorities()) {
             System.out.println("auth:"+authority.getAuthority());
+            builder.append(authority.getAuthority()).append(" - ");
         }
+        model.addAttribute("perms", builder.toString());
 
         return "index";
     }
@@ -60,6 +64,10 @@ public class TestController {
         return "test/testNormal";
     }
 
+    /**
+     *  配置 @PreAuthorize 配置
+     * @return
+     */
     @PreAuthorize("hasRole('test_normal')")
     @ResponseBody
     @RequestMapping("test/test_normal")
@@ -68,6 +76,10 @@ public class TestController {
         return "test/test_normal";
     }
 
+    /**
+     *  测试 @Secured 注解配置
+     * @return
+     */
     @Secured({"ROLE_admin"})
     @ResponseBody
     @RequestMapping("test/Secured")
@@ -76,6 +88,10 @@ public class TestController {
         return "test/Secured";
     }
 
+    /**
+     *  测试自定义方法
+     * @return
+     */
     @Secured({"IS_AUTHENTICATED_ANONYMOUSLY"})
     @ResponseBody
     @RequestMapping("test/auth")
@@ -84,6 +100,10 @@ public class TestController {
         return "test/Secured";
     }
 
+    /**
+     *  测试默认登录
+     * @return
+     */
     @ResponseBody
     @RequestMapping("user")
     public String show() {
